@@ -1,0 +1,23 @@
+// bootstrap4 customization
+$enable-shadows: true;
+$enable-transitions: true;
+$enable-rounded: false;
+$modal-header-padding: 1rem 0.5rem 0.5rem;
+$modal-inner-padding: 0.5rem 0.5rem 1rem 0.5rem;
+
+$input-btn-focus-box-shadow: none;
+$btn-box-shadow: none;
+$btn-focus-box-shadow: none;
+$btn-active-box-shadow: none;
+$btn-focus-width: 0;
+
+$primary: #f14e88;
+$secondary: #b90000;
+
+$text-muted: #999;
+
+//$body-bg: rgb(39, 43, 46);
+$body-bg: rgb(232, 232, 232);
+@import "../../node_modules/bootstrap/scss/functions";
+@import "../../node_modules/bootstrap/scss/variables";
+@import "../../node_modules/bootstrap/scss/mixins";
