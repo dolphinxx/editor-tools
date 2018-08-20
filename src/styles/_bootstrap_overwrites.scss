@@ -1,0 +1,16 @@
+.navbar-expand-lg {
+  .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+  }
+  .navbar-toggler {
+    display: none;
+  }
+  .navbar-nav {
+    flex-direction: row;
+    .nav-link {
+      padding-right: 0.5rem;
+      padding-left: 0.5rem;
+    }
+  }
+}

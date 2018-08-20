@@ -58,3 +58,43 @@ export function getAppDir(subDirectory?: String) {
 export function renderArticle(raw: String): String {
     return '<p>' + raw.replace(/\n/g, '</p><p>') + '</p>';
 }
+
+const Base64Pattern = /^data:([A-Za-z-+]+)\/([A-Za-z-+]+);base64,(.+)$/;
+export function decodeBase64Image(dataString) {
+    const matches = dataString.match(Base64Pattern),
+        response:any = {};
+    if (matches.length !== 4) {
+        return new Error('Invalid input string');
+    }
+
+    response.type = matches[1];
+    response.subtype = matches[2];
+    response.data = new Buffer(matches[3], 'base64');
+
+    return response;
+};
+
+export function getSuffix(url) {
+    let queryIndex = url.indexOf('?');
+    if(queryIndex !== -1) {
+        url = url.substring(0, queryIndex);
+    }
+    let hashIndex = url.indexOf('#');
+    if(hashIndex !== -1) {
+        url = url.substring(0, hashIndex);
+    }
+    let dotIndex = url.lastIndexOf('.');
+    if(dotIndex === -1) {
+        return null;
+    }
+    return url.substring(dotIndex + 1);
+};
+
+export function serial(tasks, index, consumer, callback) {
+    const current = tasks.shift();
+    if (!current) {
+        callback();
+        return;
+    }
+    consumer(current, index, () => serial(tasks, index + 1, consumer, callback));
+};

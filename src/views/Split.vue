@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div id="form" class="form">
+    <div class="row">
+        <div id="form" class="form col-sm-6">
             <h2>分章</h2>
             <div class="form-row">
                 <div class="form-group col-6">
@@ -36,10 +36,10 @@
             <div>
                 <button class="btn btn-primary btn-sm" v-bind:disabled="!file" v-on:click="splitFile">开始分章</button>
                 <button class="btn btn-success btn-sm" :disabled="!splitFinished" v-on:click="exportResult">导出结果</button>
-                <button class="btn btn-default btn-sm" v-on:click="addRegex">添加规则</button>
+                <button class="btn btn-default btn-sm" v-on:click="manageRegex">管理规则</button>
             </div>
         </div>
-        <div id="preview">
+        <div id="preview" class="col-sm-6">
             <h2>预览</h2>
             <div id="previewContainer">
                 <p v-if="splitFinished">共<code>{{chapters.length}}</code>章</p>
@@ -52,37 +52,41 @@
                 </ul>
             </div>
         </div>
-        <div v-if="showAddRegexModal" class="modal fade show" style="display: block;" id="addRegexModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="close" aria-label="Close" v-on:click="showAddRegexModal = false">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+        <Modal title="管理规则" ref="modal">
+            <div class="form">
+                <div class="row">
+                    <div class="form-group col-sm-6">
+                        <label class="col-form-label">规则</label>
+                        <input class="form-control" v-model="formRegex">
                     </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label class="col-form-label">规则</label>
-                                <input class="form-control" v-model="formRegex">
-                            </div>
-                            <div class="form-group">
-                                <label class="col-form-label">替换</label>
-                                <input class="form-control" v-model="formReplace">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" v-on:click="showAddRegexModal = false">关闭</button>
-                        <button type="button" class="btn btn-primary"  v-on:click="submitAddRegex">确定</button>
+                    <div class="form-group col-sm-6">
+                        <label class="col-form-label">替换</label>
+                        <input class="form-control" v-model="formReplace">
                     </div>
                 </div>
+                <p><small><code>$0</code>=匹配到的文本</small></p>
+                <p><small><code>$1-n</code>=匹配到的第n个括号内文本</small></p>
+                <div class="form-group">
+                    <button class="btn btn-primary" v-on:click="addRegex" :disabled="!formRegex || !formReplace">添加</button>
+                </div>
             </div>
-        </div>
+            <table class="table">
+                <tr>
+                    <th>规则</th>
+                    <th>替换</th>
+                    <th>操作</th>
+                </tr>
+                <tr v-for="(r, index) in regexList" v-bind:key="r.regex">
+                    <td><code>{{r.regex}}</code></td>
+                    <td><code>{{r.replace}}</code></td>
+                    <td><button class="btn btn-danger btn-sm" v-on:click="removeRegex(index)">删除</button></td>
+                </tr>
+            </table>
+        </Modal>
     </div>
 </template>
 <script>
+    import Modal from "../components/Modal";
     const $ = require('jquery');
     const fs = require('fs');
     const path = require('path');
@@ -94,6 +98,7 @@
 
     export default {
         name: 'Split',
+        components: {Modal},
         watch: {
           regex: 'onRegexChange'
         },
@@ -107,7 +112,6 @@
               charset: null,
               formRegex: '',
               formReplace: '',
-              showAddRegexModal: false,
               splitFinished: false
           }
         },
@@ -158,16 +162,28 @@
                 }
                 this.$set(this.chapters, index, chapter);
             },
-            addRegex() {
-                this.showAddRegexModal = true;
+            manageRegex() {
+                this.$refs.modal.show();
             },
-            submitAddRegex() {
-
+            hide() {
+                this.showRegexModal = false;
+                console.log(this.showRegexModal);
+            },
+            addRegex() {
+                this.regexList.push({regex: this.formRegex, replace: this.formReplace});
+                storage.setRegexList(this.regexList);
+                this.formRegex = '';
+                this.formReplace = '';
+            },
+            removeRegex(index) {
+                this.regexList.splice(index, 1);
+                storage.setRegexList(this.regexList);
             }
         }
     }
 </script>
 <style lang="scss" scoped>
+    @import "../styles/variables";
     #form {
         float: left;
         width: 400px;
@@ -195,5 +211,15 @@
 
     #preview li p {
         text-indent: 2em;
+    }
+
+    form {
+        p {
+            margin-bottom: 0.5em;
+        }
+    }
+    .modal-body {
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 </style>

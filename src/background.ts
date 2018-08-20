@@ -7,7 +7,9 @@ import createProtocol from 'vue-cli-plugin-electron-builder/lib/createProtocol.j
 // import Event = Electron.Event;
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
-
+app.__dirname = __dirname;
+app.__static = __static;
+console.log(__dirname, __static, app.__dirname);
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: any
 
@@ -15,7 +17,8 @@ let mainWindow: any
 protocol.registerStandardSchemes(['app'], {secure: true})
 
 function createMainWindow() {
-    const window = new BrowserWindow()
+    app.commandLine.appendSwitch('disable-web-security');
+    const window = new BrowserWindow({webPreferences: {webSecurity: false}});
 
     if (isDevelopment) {
         // Load the url of the dev server if in development mode
