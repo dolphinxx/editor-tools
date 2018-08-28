@@ -27,7 +27,7 @@ export function split(file: string, charset: string, regex: string, replacement:
         }
         const match = regExp.exec(line);
         if (match !== null) {
-            let name = replacement.replace(/\$(\d+)/, function (m, p1) {
+            let name = replacement.replace(/\$(\d+)/g, function (m, p1) {
                 return match[parseInt(p1)];
             });
             if (buff.length > 0) {
